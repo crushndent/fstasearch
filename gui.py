@@ -320,7 +320,7 @@ class SearchWindow(QWidget):
             # If settings dialog is open, don't close main window
             if not self.settings_dialog_open:
                 self.save_state()
-                self.close()
+                self.hide()
         return super().event(event)
     
     def open_context_menu(self, pos):
@@ -448,14 +448,23 @@ class SearchWindow(QWidget):
             edge += "right"
             
         return edge if edge else None
-        # Ensure the application process terminates
-        QApplication.instance().quit()
-        super().closeEvent(event)
+    def closeEvent(self, event):
+        # Override close to just hide
+        # If settings dialog is open, we might want to handle that differently, 
+        # but generally we just hide the main window.
+        if self.settings_dialog_open:
+             # If settings are open, we probably shouldn't hide the main window aggressively or we should close settings too?
+             # Let's just hide myself.
+             pass
+             
+        self.save_state()
+        self.hide()
+        event.ignore() # Ignore the close event so we don't destroy the widget
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
             self.save_state()
-            self.close()
+            self.hide()
         elif event.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down):
             self.results_list.setFocus()
             if self.results_list.count() > 0:
@@ -478,7 +487,7 @@ class SearchWindow(QWidget):
             clipboard = QApplication.clipboard()
             clipboard.setText(full_path)
             logging.info(f"Copied to clipboard: {full_path}")
-            # self.close() # Keep window open as requested
+            self.hide() 
         else:
             if self.results_list.count() > 0:
                 item = self.results_list.item(0)
@@ -486,4 +495,4 @@ class SearchWindow(QWidget):
                 clipboard = QApplication.clipboard()
                 clipboard.setText(full_path)
                 logging.info(f"Copied to clipboard: {full_path}")
-                # self.close() # Keep window open as requested
+                self.hide()
