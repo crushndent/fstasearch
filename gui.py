@@ -4,7 +4,7 @@ import logging
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QListWidget, 
                              QLineEdit, QLabel, QListWidgetItem, QGraphicsDropShadowEffect,
                              QPushButton, QDialog, QTabWidget, QFileDialog, QToolButton,
-                             QSpinBox, QFormLayout, QMenu)
+                             QSpinBox, QFormLayout, QMenu, QCheckBox)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QEvent
 from PyQt6.QtGui import QColor, QGuiApplication, QClipboard, QIcon, QAction
 
@@ -90,6 +90,10 @@ class SettingsDialog(QDialog):
         self.depth_spin.setSuffix(" folders")
         layout.addRow("Path Display Depth:", self.depth_spin)
 
+        self.tooltips_cb = QCheckBox("Show Tooltips")
+        self.tooltips_cb.setChecked(self.config.get("display_tooltips", True))
+        layout.addRow("", self.tooltips_cb)
+
         return widget
 
     def add_folder(self, list_widget):
@@ -113,6 +117,7 @@ class SettingsDialog(QDialog):
         self.config["include_directories"] = includes
         self.config["exclude_directories"] = excludes
         self.config["path_display_depth"] = self.depth_spin.value()
+        self.config["display_tooltips"] = self.tooltips_cb.isChecked()
         
         config.save_config(self.config)
         self.accept()
@@ -281,7 +286,11 @@ class SearchWindow(QWidget):
             display_text = self._truncate_path(match)
             item = QListWidgetItem(display_text)
             item.setData(Qt.ItemDataRole.UserRole, match) # Store full path
-            item.setToolTip(match)
+            
+            if self.app_config.get("display_tooltips", True):
+                item.setToolTip(f"Left click to copy, Right click to visit")
+            else:
+                item.setToolTip(match)
             self.results_list.addItem(item)
         
         if self.results_list.count() > 0:

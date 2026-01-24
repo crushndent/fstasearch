@@ -11,7 +11,8 @@ DEFAULT_CONFIG = {
     "exclude_directories": [],
     "last_search": "",
     "path_display_depth": 3,
-    "window_size": [1000, 400]
+    "window_size": [1000, 400],
+    "display_tooltips": True
 }
 
 def load_config():
