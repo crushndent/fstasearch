@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 
 class Indexer:
     def __init__(self, include_dirs, exclude_dirs=None):
@@ -17,7 +18,7 @@ class Indexer:
 
     def scan(self):
         """Recursively scans the directories and builds a list of files and directories."""
-        print(f"Scanning...")
+        logging.info(f"Scanning...")
         start_time = time.time()
         file_list = []
         dir_list = []
@@ -47,16 +48,17 @@ class Indexer:
                     for file in files:
                         if not file.startswith('.'):
                             full_path = os.path.join(root, file)
+                            full_path = os.path.join(root, file)
                             if full_path not in seen_paths and not self._is_excluded(full_path):
                                 file_list.append(full_path)
                                 seen_paths.add(full_path)
             except Exception as e:
-                print(f"Error scanning {root_dir}: {e}")
+                logging.error(f"Error scanning {root_dir}: {e}")
 
         self.files = file_list
         self.directories = dir_list
         self.last_scan = time.time()
-        print(f"Scanned {len(self.directories)} directories and {len(self.files)} files in {self.last_scan - start_time:.4f}s")
+        logging.info(f"Scanned {len(self.directories)} directories and {len(self.files)} files in {self.last_scan - start_time:.4f}s")
     
     def search(self, query, limit=50):
         """

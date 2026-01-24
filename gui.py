@@ -1,5 +1,6 @@
 import sys
 import os
+import logging
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QListWidget, 
                              QLineEdit, QLabel, QListWidgetItem, QGraphicsDropShadowEffect,
                              QPushButton, QDialog, QTabWidget, QFileDialog, QToolButton,
@@ -346,7 +347,7 @@ class SearchWindow(QWidget):
             self.save_state()
             # self.close() # Keep window open, allow focus loss to close it
         except Exception as e:
-            print(f"Error opening explorer: {e}")
+            logging.error(f"Error opening explorer: {e}")
 
     # --- Resizing Logic ---
     def mousePressEvent(self, event):
@@ -467,7 +468,7 @@ class SearchWindow(QWidget):
             full_path = current_item.data(Qt.ItemDataRole.UserRole)
             clipboard = QApplication.clipboard()
             clipboard.setText(full_path)
-            print(f"Copied to clipboard: {full_path}")
+            logging.info(f"Copied to clipboard: {full_path}")
             # self.close() # Keep window open as requested
         else:
             if self.results_list.count() > 0:
@@ -475,5 +476,5 @@ class SearchWindow(QWidget):
                 full_path = item.data(Qt.ItemDataRole.UserRole)
                 clipboard = QApplication.clipboard()
                 clipboard.setText(full_path)
-                print(f"Copied to clipboard: {full_path}")
+                logging.info(f"Copied to clipboard: {full_path}")
                 # self.close() # Keep window open as requested
