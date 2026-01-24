@@ -59,7 +59,26 @@ def main():
         include_dirs = [str(Path.home())]
 
     indexer = Indexer(include_dirs, exclude_dirs)
-    indexer.scan()
+    
+    # Check if we need to re-index (Weekly)
+    last_scan = user_config.get("last_scan", 0)
+    now = __import__('time').time()
+    week_seconds = 7 * 24 * 60 * 60
+    
+    if now - last_scan > week_seconds:
+        logging.info("Index is older than 1 week. Starting background re-index.")
+        indexer.scan_async()
+    elif not indexer.files and not indexer.directories:
+         # Empty DB? Scan now.
+         logging.info("No index found in DB. Scanning now.")
+         # First scan: we might want to block or async? 
+         # Async is better for perceived speed, but user will see empty results for a moment.
+         # Let's do async but maybe UI handles empty state? 
+         # Actually for first run, async is fine, results will pop in next search or if we refresh?
+         # The UI updates from indexer.files reference.
+         # But the UI copies matches.
+         # Let's just scan async.
+         indexer.scan_async()
 
     # Show Window
     window = SearchWindow(indexer)
