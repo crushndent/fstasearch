@@ -11,7 +11,7 @@ class Indexer:
         self.exclude_dirs = exclude_dirs or []
         # Load from DB immediately for fast startup
         self.files, self.directories = database.db.get_index()
-        self.last_scan = 0
+        self.last_scan = database.db.get_setting('last_scan', 0)
         self.is_scanning = False
 
     def _is_excluded(self, path):
